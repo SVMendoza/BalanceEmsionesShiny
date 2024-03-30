@@ -3,7 +3,7 @@ ui <- fluidPage(
   tabsetPanel(
     tabPanel("Reservorios", tabsetPanel(
       tabPanel("Entrada",ReservorioUI('modulo0')),
-      tabPanel('result', ParaEntradaUI('modulo01'))
+      tabPanel('result', ParaEntradaUI0('modulo01'))
     )),      
     
     tabPanel("Datos de actividad (referencia)", tabsetPanel(
