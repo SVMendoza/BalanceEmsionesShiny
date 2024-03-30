@@ -20,17 +20,4 @@ Dir<-''
 -------------------------------------------------------
 
 
-![img](https://github.com/SVMendoza/BalanceEmsionesShiny/blob/main/paneles.png.jpg)
-
-
-
-
-
-
--------------------------------------------------------
-
--------------------------------------------------------
-
-![img](https://github.com/SVMendoza/BalanceEmsionesShiny/blob/main/paneles.png.jpg)
-
--------------------------------------------------------
+![img](https://github.com/SVMendoza/BalanceEmsionesShiny/blob/main/paneles.png)
