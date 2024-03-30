@@ -476,30 +476,49 @@ Moduloreporte <- function(id, datosRes,datosResMC,  datosActRef,
                           datosActRefMC, datosActReS, datosActReSMC, datosBalanceMC, 
                           datosBalancexFExYrsMC, datosBalanceTotalXyrs) {
   moduleServer(id, function(input, output, session) {
-    
-    
     observeEvent(input$RunReporte, {
-      
+     
       tryCatch({
         # Verificar si todos los elementos de la lista son data frames
-        
-        lista_datos <- list(datosRes, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
+        lista_datos <- list(datosResMC, datosRes, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
                             datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs)
         
         es_data_frame <- function(x) {is.data.frame(x()[[1]][[3]])}
         todos_data_frames <- all(sapply(lista_datos, es_data_frame))
+     
+        if (todos_data_frames) {
+          
+            
+            
+         
+  eventReporte(datosResMC, datosRes,datosActRef, datosActRefMC, datosActReS, datosActReSMC,
+                       datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs)
+  
+          output$renderedReporte<-renderUI({
+            includeMarkdown(knitr::knit('reporte_final.Rmd'))
+          })
+          ReportExcel(datosResMC, datosRes, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
+                      datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs)
+         
+        } else {
+          # Acciones a realizar si no todos los elementos son data frames
+          showModal(modalDialog(title = "Error en los datos",
+                                "No todos los elementos son data frames.",
+                                easyClose = TRUE))
+        }
         
       }, error = function(e) {
-        
         if (grepl("object 'dMCRef' not found", e$message)) {
           showModal(modalDialog(title = "No hay acciones disponibles",
                                 "No se ha definido ninguna acción para realizar.",
                                 easyClose = TRUE))
         } else {
-          eventReporte()
-          ReportExcel()
-        } 
-      } )
+          # Otros errores que puedan surgir durante la ejecución
+          showModal(modalDialog(title = "Error en la ejecución",
+                                "Se ha producido un error durante la ejecución del reporte.",
+                                easyClose = TRUE))
+        }
+      })
       
       
     })

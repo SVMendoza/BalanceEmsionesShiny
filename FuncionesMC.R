@@ -2,22 +2,27 @@
 library(compiler)
 library(propagate)
 
-
 #source('C:\\R_ejerc\\shainyPrueba\\Incert\\Propagation\\incertidumbrePropagacion.r')
-eventReporte<-function() {
+eventReporte<-function(datosRes, datosResMC, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
+                       datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs) {
   
-  ResevorioDt<-datosRes()[[1]][[3]]
-  ResevorioDtMC<-datosResMC()[[1]][[3]]
+  
+  ## Reservorios
+  
+  ResevorioDt<-datosResMC()[[1]][[3]]
+  ResevorioDtMC<-datosRes()[[1]][[3]]
   
   ##Actividad
+  
   #Referencia
+
   RefereDt<-datosActRef()[[1]][[3]]
   RefereDtMC<-datosActRefMC()[[1]][[3]]
   
   #Resultados
   ReSereDt<-datosActReS()[[1]][[3]]
   ReSereDtMC<-datosActReSMC()[[1]][[3]]
-  
+
   #Balances
   
   BalanceXEstratoFEYrsDt<-datosBalanceMC()[[1]][[3]]
@@ -26,29 +31,34 @@ eventReporte<-function() {
   
   contenidoReporte <- paste0("# Reporte de estimaciones\n\n",
                              "### Reservorios\n\n",
-                             "```{r setup, include=FALSE, warning=FALSE, message=FALSE}\n",
-                             "knitr::kable(head(ResevorioDt), caption = 'Resevorios')\n",
-                             "knitr::kable(head(ResevorioDtMC), caption = 'Total de estimación')\n\n",
-                             "```","### Datos de actividad:\n\n", 
-                             "knitr::kable(head(RefereDt), caption = 'Referencia')\n",
-                             "knitr::kable(head(ReSereDt), caption = 'Resultados')\n\n",
-                             "```",
-                             "knitr::kable(head(RefereDtMC), caption = 'Referencia Carbono Monte Carlo')\n",
-                             "knitr::kable(head(ReSereDtMC), caption = 'Resultados Carbono Monte Carlo')\n\n",
+                             "```{r setup, include=FALSE}
+                             knitr::opts_chunk$set(echo = TRUE)\n",
+                             "```\n\n",
+                             "```{r, include=FALSE, warning=FALSE, message=FALSE}\n",
+                             "knitr::kable(ResevorioDt, caption = 'Resevorios')\n",
+                             "knitr::kable(ResevorioDtMC, caption = 'Total de estimación')\n\n",
+                             "```\n\n","### Datos de actividad:\n\n",
+                            
+                             "```{r, include=FALSE, warning=FALSE, message=FALSE}\n",
+                             "knitr::kable(RefereDt, caption = 'Referencia')\n",
+                             "knitr::kable(ReSereDt, caption = 'Resultados')\n\n",
+                             "```\n\n",
+                             "```{r, include=FALSE, warning=FALSE, message=FALSE}\n",
+                             "knitr::kable(RefereDtMC, caption = 'Referencia Carbono Monte Carlo')\n",
+                             "knitr::kable(ReSereDtMC, caption = 'Resultados Carbono Monte Carlo')\n\n",
+                             "```\n\n",
                              "### Balances:\n\n", 
-                             "knitr::kable(head(BalanceXEstratoFEYrsDt), caption = 'Resultados - Referencia. Monte Carlo')\n",
-                             "knitr::kable(head(BalancexFEYrs), caption = 'Balance FE y Años. Monte Carlo')\n\n",
-                             "knitr::kable(head(BalancexYrs), caption = 'Balance total por año. Monte Carlo')\n")
-  
+                             "```{r, include=FALSE, warning=FALSE, message=FALSE}\n",
+                             "knitr::kable(BalanceXEstratoFEYrsDt, caption = 'Resultados - Referencia. Monte Carlo')\n",
+                             "knitr::kable(BalancexFEYrs, caption = 'Balance FE y Años. Monte Carlo')\n\n",
+                             "knitr::kable(BalancexYrs, caption = 'Balance total por año. Monte Carlo')\n",
+                             "```\n\n")
+ 
   writeLines(contenidoReporte, "reporte_final.Rmd")
-  
-  output$renderedReporte <- renderUI({
-    includeMarkdown(knitr::knit("reporte_final.Rmd")) 
-  })
-  
-}
+ }
 
-ReportExcel<-function() {output$downloadReport <- downloadHandler(
+ReportExcel<-function(datosRes, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
+                      datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs) {output$downloadReport <- downloadHandler(
   filename = function() {
     if (input$format == "PDF") {
       "reporte_generado.pdf"
