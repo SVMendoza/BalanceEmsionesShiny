@@ -4,8 +4,14 @@ Repositorio para una aplicación Shiny que permite generar reportes de balances 
 
 <p> R </p>
 
+
 ------------------------------
 source(paste0(Dir, '\\Ejecutar.r'))
 
-Dir<-'' # Agregar el directorio de la aplicación
+------------------------------
+
+Agregar el directorio de la aplicación
+
+------------------------------
+Dir<-' C:/...' 
 ------------------------------
