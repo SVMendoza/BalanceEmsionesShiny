@@ -4,13 +4,20 @@ Repositorio para una aplicación Shiny que permite generar reportes de balances 
 
 <p> R </p>
 
-<<<<<<< HEAD
+--------------------------------------------------------
+
 source(paste0(Dir, '\\Ejecutar.r'))
 
+-------------------------------------------------------
 
-Dir<-'' # Agregar el directorio de la aplicación
-=======
-$$source(paste0(Dir,' '\\Ejecutar.r'))$$
+Agregar el directorio de la aplicación
+-------------------------------------------------------
+Dir<-'' 
 
-$$Dir<-'' }$$ # Agregar el directorio de la aplicación
->>>>>>> 02ea19ac207bb1ba22dab84da4b5edaa7edad359
+-------------------------------------------------------
+
+-------------------------------------------------------
+
+![img](https://github.com/SVMendoza/BalanceEmsionesShiny/blob/main/paneles.png.jpg)
+
+-------------------------------------------------------

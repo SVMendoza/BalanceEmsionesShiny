@@ -154,7 +154,7 @@ ModuloPropagacionMC <- function(id, datos) {
       Ldt<-list()
       
       f<-function(x) {
-        sal<-try(IMC(propag.Vari=x$Reservorio, nsim=nsim, Mean=x$Media, SE=x$E.E, nplot=100, 
+        sal<-try(IMC(propag.Vari=x$Reservorio, nsim=nsim, Mean=x$Media*input$RMCarbono, SE=x$E.E*input$RMCarbono, nplot=100, 
                      CI=CI, type.Propag=type.Propag, plot=FALSE),silent=TRUE)
         if(class(sal)=='try-error') { sal<-data.frame(NA,NA,NA,NA,NA) 
         names(sal)<-c('Mean','S.E','Lower (95%)','Upper (95%)','Uncertainty 95%')
