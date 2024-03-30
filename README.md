@@ -19,5 +19,10 @@ Dir<-''
 
 -------------------------------------------------------
 
+# Entrada por componente de carbono
+
+![img](https://github.com/SVMendoza/BalanceEmsionesShiny/blob/main/paneles.png)
+
+# Resultado de la Simulación. Suma de los distintos componentes y propagación de la incertidumbre.
 
 ![img](https://github.com/SVMendoza/BalanceEmsionesShiny/blob/main/paneles.png)
