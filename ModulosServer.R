@@ -143,6 +143,16 @@ ModuloPropagacionMC <- function(id, datos) {
   moduleServer(id, function(input, output, session) {
     observeEvent(input$Run, {
       
+      S<-try(datos()[[1]][[3]], silent=TRUE)
+      
+      if (class(S)=="try-error" || nrow(S)==0) {
+        showModal(modalDialog(
+          title = "Error",
+          "No hay datos disponibles para la propagación de Monte Carlo.",
+          easyClose = TRUE
+        ))
+      } else {
+   
       set.seed(input$nseed)
       dMC<-as.data.frame(datos()[[1]][[3]]  )
       
@@ -182,7 +192,9 @@ ModuloPropagacionMC <- function(id, datos) {
                                                           escape   = FALSE,
                                                           editable = TRUE)
       })
-    })
+ 
+      }
+  })
     return(
       reactive({DT::datatable(Ldt1) })
     )
@@ -198,6 +210,18 @@ ModuloPropagacionMCREF <- function(id, dts1, dts2) {
   moduleServer(id, function(input, output, session) {
     
     observeEvent(input$Run, {
+      
+      S<-try(dts1()[[1]][[3]], silent=TRUE)
+      S1<-try(dts2()[[1]][[3]], silent=TRUE)
+      
+      if (class(S)=="try-error" || class(S1)=="try-error") {
+        showModal(modalDialog(
+          title = "Error",
+          "No hay datos disponibles para la propagación de Monte Carlo.",
+          easyClose = TRUE
+        ))
+      } else {
+      
       
       nsim<-input$num_simulaciones
       CI<-input$IC
@@ -234,7 +258,7 @@ ModuloPropagacionMCREF <- function(id, dts1, dts2) {
                                                          escape   = FALSE,
                                                          editable = TRUE)
       })
-      
+      }
       
     })
     return(
@@ -252,6 +276,17 @@ ModuloPropagacionMCRES <- function(id, dts1, dts2) {
   moduleServer(id, function(input, output, session) {
     
     observeEvent(input$Run, {
+      
+      S<-try(dts1()[[1]][[3]], silent=TRUE)
+      S1<-try(dts2()[[1]][[3]], silent=TRUE)
+      
+      if (class(S)=="try-error" || class(S1)=="try-error") {
+        showModal(modalDialog(
+          title = "Error",
+          "No hay datos disponibles para la propagación de Monte Carlo.",
+          easyClose = TRUE
+        ))
+      } else {
       
       nsim<-input$num_simulaciones
       CI<-input$IC
@@ -289,6 +324,7 @@ ModuloPropagacionMCRES <- function(id, dts1, dts2) {
                                                          editable = TRUE)
       })
       
+      }
       
     })
     return(
@@ -307,6 +343,16 @@ ModuloPropagacionMCBalance <- function(id, dts1, dts2) {
     
     observeEvent(input$Run, {
       
+      S<-try(dts1()[[1]][[3]], silent=TRUE)
+      S1<-try(dts2()[[1]][[3]], silent=TRUE)
+      
+      if (class(S)=="try-error" || class(S1)=="try-error") {
+        showModal(modalDialog(
+          title = "Error",
+          "No hay datos disponibles para la propagación de Monte Carlo.",
+          easyClose = TRUE
+        ))
+      } else {    
       nsim<-input$num_simulaciones
       CI<-input$IC
       if(input$Propaga=="Adición") type.Propag<-'ADDITION' else if(input$Propaga=="Sustracción") type.Propag<-'SUBTRACTION' else type.Propag<-'MULTIPLICATION'
@@ -347,7 +393,7 @@ ModuloPropagacionMCBalance <- function(id, dts1, dts2) {
                                                          editable = TRUE)
       })
       
-      
+      }
     })
     return(
       reactive({DT::datatable(dMCRef) })
@@ -362,6 +408,18 @@ ModuloPropagacionMCBalance <- function(id, dts1, dts2) {
 ModuloPropagacionMCBalanceXFeTotal <- function(id, dtsTotal) {
   moduleServer(id, function(input, output, session) {
     observeEvent(input$Run, {
+      
+      S<-try(dtsTotal()[[1]][[3]], silent=TRUE)
+     
+      
+      if (class(S)=="try-error") {
+        showModal(modalDialog(
+          title = "Error",
+          "No hay datos disponibles para la propagación de Monte Carlo.",
+          easyClose = TRUE
+        ))
+      } else {    
+        
       
       set.seed(input$nseed)
       nsim<-input$num_simulaciones
@@ -402,6 +460,8 @@ ModuloPropagacionMCBalanceXFeTotal <- function(id, dtsTotal) {
                                                           escape   = FALSE,
                                                           editable = TRUE)
       })
+      
+      }
     })
     return(
       reactive({DT::datatable(Ldttt) })
@@ -479,24 +539,24 @@ Moduloreporte <- function(id, datosRes,datosResMC,  datosActRef,
     observeEvent(input$RunReporte, {
      
       tryCatch({
-        # Verificar si todos los elementos de la lista son data frames
+        
         lista_datos <- list(datosResMC, datosRes, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
                             datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs)
         
         es_data_frame <- function(x) {is.data.frame(x()[[1]][[3]])}
         todos_data_frames <- all(sapply(lista_datos, es_data_frame))
-     
+        
         if (todos_data_frames) {
           
-            
-            
-         
-  eventReporte(datosResMC, datosRes,datosActRef, datosActRefMC, datosActReS, datosActReSMC,
+                        eventReporte(datosResMC, datosRes,datosActRef, datosActRefMC, datosActReS, datosActReSMC,
                        datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs)
-  
-          output$renderedReporte<-renderUI({
-            includeMarkdown(knitr::knit('reporte_final.Rmd'))
+          
+          output$renderedReporte<-renderUI({ 
+            rmarkdown::render(file.path(getwd(), 'reporte_final.Rmd'))
+            
           })
+        
+          
           ReportExcel(datosResMC, datosRes, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
                       datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs)
          
