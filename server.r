@@ -1,5 +1,10 @@
 server <- function(input, output, session) {
   
+  
+  datosReactGlob<-reactiveValues(datosG = NULL)
+
+  
+  
   ReservMC <- fServer0("modulo0")
   dtRes<-ModuloPropagacionMC('modulo01', datos = ReservMC)
   
@@ -16,4 +21,9 @@ server <- function(input, output, session) {
   Moduloreporte('modulo4', datosRes = ReservMC,datosResMC=dtRes,  datosActRef=dtREF, 
                 datosActRefMC=dtREFMC, datosActReS=dtRESUL, datosActReSMC=dtRESULMC, 
                 datosBalanceMC=dtBalance, datosBalancexFExYrsMC=dtBalanceTotal, datosBalanceTotalXyrs=dtBalanceTotalEnd) 
+  observeEvent(input$resetButton, {
+    rm(list = ls())
+    session$reload()
+  })
+  
 }

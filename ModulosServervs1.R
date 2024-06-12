@@ -562,58 +562,66 @@ ModuloPropagacionMCBalanceTotal <- function(id, dtsTotall) {
 ############################################################################################
 ####################################
 ## REPORTE
-Moduloreporte <- function(id, datosRes, datosResMC, datosActRef, datosActRefMC, datosActReS, datosActReSMC, datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs) {
+Moduloreporte <- function(id, datosRes,datosResMC,  datosActRef, 
+                          datosActRefMC, datosActReS, datosActReSMC, datosBalanceMC, 
+                          datosBalancexFExYrsMC, datosBalanceTotalXyrs) {
   
   moduleServer(id, function(input, output, session) {
     observeEvent(input$RunReporte, {
       
-      datos_reactive <- reactive({
-        datosRes$Restb$dRESER
-      })
+      es_data_frame <- function(x) {is.data.frame(x)}
+      lista_datos <- try(list(
+        as.data.frame(datosResMC$dataRMC()$Ldt1),
+        as.data.frame(datosRes$Restb()$dRESER),
+        as.data.frame(datosActRef$ActReftb()$dtRef),
+        as.data.frame(datosActRefMC$dataREF()$dMCRef),
+        as.data.frame(datosActReS$ActReftb()$dtRef),
+        as.data.frame(datosActReSMC$dataRES()$dMCReS),
+        as.data.frame(datosBalanceMC$dataBal()$dMCRef),
+        as.data.frame(datosBalancexFExYrsMC$dataBalTot1()$Ldttt),
+        as.data.frame(datosBalanceTotalXyrs$dataBalTot2()$Ldtt2)
+      ), silent = TRUE)
+      # Acceder y convertir los datos en un data frame en una sola línea
+     
       
-      datos_df <- isolate({
-        datos_reactive()
-      })
+      
+      print(str(lista_datos))
     
-      print(datos_df)
       
-      # Acceder a los datos reactivos de manera reactiva
-      datosReactivos <- reactive({
-        lista_datos <- list(
-          datosResMC$dataRMC()$Ldt1,
-          datosRes$Restb()$dRESER,
-          datosActRef$ActReftb()$dtRef,
-          datosActRefMC$dataREF()$dMCRef,
-          datosActReS$ActReftb()$dtRef,
-          datosActReSMC$dataRES()$dMCReS,
-          datosBalanceMC$dataBal()$dMCRef,
-          datosBalancexFExYrsMC$dataBalTot1()$Ldttt,
-          datosBalanceTotalXyrs$dataBalTot2()$Ldtt2
-        )
-        return(lista_datos)
-      })
-      print(datosReactivos())
-      # Generar el reporte en Excel al presionar el botón
-      output$downloadReport <- downloadHandler(
-        filename = function() {
-          if (input$formato == "Excel") {
-            return("Reporte.xlsx")
-          } else if (input$formato == "PDF") {
-            return("Reporte.pdf")
-          } else {
-            return("Reporte.docx")
-          }
-        }, print(filename()),
-        content = function(filename) {
-          datosReactivos <- datosReactivos()  # Obtener los datos reactivos
-          formato <- isolate(input$formato)  # Obtener el formato seleccionado
-          ReporteExcel(output, datosReactivos, formato, filename)  # Generar el reporte en el formato seleccionado
+      if(class(lista_datos)=="try-error") {
+        showModal(modalDialog(title = "Error en la ejecución",
+                              "Se ha producido un error durante la ejecución del reporte.",
+                              easyClose = TRUE))
+        
+      } else {
+        todos_data_frames <- try(all(sapply(lista_datos, es_data_frame)),silent=TRUE)
+        
+        if(class(todos_data_frames)=="try-error") {
+          showModal(modalDialog(title = "Error en la ejecución",
+                                "Faltan datos para el reporte.",
+                                easyClose = TRUE))
+          
+        } else if(todos_data_frames){ 
+          print(0)
+          
+          #params<-FuncDatosList(lista_datos)
+          params<-lista_datos
+          
+          print(params)
+         ReportExcel(params)
+          
+        } else {
+          showModal(modalDialog(title = "Error en la ejecución",
+                                "No todos los datos son tablas.",
+                                easyClose = TRUE))
+          
         }
-      )
-      
+      }
     })
   })
 }
+
+
 
 
 

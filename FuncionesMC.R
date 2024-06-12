@@ -1,13 +1,26 @@
 ## Funciones
 library(compiler)
 library(propagate)
+##Resetear la aplicacion
+
+resetSession <- function() {
+  rm(list = ls())
+}
 
 
 
 #### archivo markdown funcion
 
 fRmd<-function() {
-paste0("# Reporte de estimaciones\n\n",
+paste0("---\n",
+       "title: \"Reporte emisiones\"\n",
+       "author: \"Tu Nombre\"\n",
+       "date: \"Fecha\"\n",
+       "output:\n",
+       "  ", formato,'_document\n',
+       "    toc: true\n",
+       "    number_sections: true\n",
+       "---\n\n","# Reporte de estimaciones\n\n",
                            "### Reservorios\n\n",
                            "```{r setup, include=FALSE}\n",
                            "knitr::opts_chunk$set(echo = TRUE)\n",
@@ -33,112 +46,77 @@ paste0("# Reporte de estimaciones\n\n",
                            "```\n\n")
 }
 
-#source('C:\\R_ejerc\\shainyPrueba\\Incert\\Propagation\\incertidumbrePropagacion.r')
-eventReporte<-function(datosRes, datosResMC, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
-                       datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs) {
-  
-  
-  ## Reservorios
-  
-  ResevorioDt<-as.data.frame(datosResMC()[[1]][[3]])
-  ResevorioDtMC<-as.data.frame(datosRes()[[1]][[3]])
-  
-  ##Actividad
+FuncDatosList<-function(x){
+  ResevorioDt<-as.data.frame(x[[1]])
+  ResevorioDtMC<-as.data.frame(x[[2]])
   
   #Referencia
-
-  RefereDt<-as.data.frame(datosActRef()[[1]][[3]])
-  RefereDtMC<-as.data.frame(datosActRefMC()[[1]][[3]])
+  
+  RefereDt<-as.data.frame(x[[3]])
+  RefereDtMC<-as.data.frame(x[[4]])
+  
   
   #Resultados
-  ReSereDt<-as.data.frame(datosActReS()[[1]][[3]])
-  ReSereDtMC<-as.data.frame(datosActReSMC()[[1]][[3]])
-
-  BalanceXEstratoFEYrsDt<-as.data.frame(datosBalanceMC()[[1]][[3]])
-  BalancexFEYrs<-as.data.frame(datosBalancexFExYrsMC()[[1]][[3]])
-  BalancexYrs<-as.data.frame(datosBalanceTotalXyrs()[[1]][[3]])
+  ReSereDt<-as.data.frame(x[[5]])
+  ReSereDtMC<-as.data.frame(x[[6]])
   
+  BalanceXEstratoFEYrsDt<-as.data.frame(x[[7]])
+  BalancexFEYrs<-as.data.frame(x[[8]])
+  BalancexYrs<-as.data.frame(x[[9]])
   
- 
-  writeLines(fRmd(), "reporte_final.Rmd")
- }
-
-ReportExcel<-function(datosRes, datosResMC, datosActRef, datosActRefMC, datosActReS, datosActReSMC,
-                      datosBalanceMC, datosBalancexFExYrsMC, datosBalanceTotalXyrs) {
-  
-  ## Reservorios
-  
-  ResevorioDt<-as.data.frame(datosResMC()[[1]][[3]])
-  ResevorioDtMC<-as.data.frame(datosRes()[[1]][[3]])
-
-  #Referencia
-  
-  RefereDt<-as.data.frame(datosActRef()[[1]][[3]])
-  RefereDtMC<-as.data.frame(datosActRefMC()[[1]][[3]])
-  
-  #Resultados
-  ReSereDt<-as.data.frame(datosActReS()[[1]][[3]])
-  ReSereDtMC<-as.data.frame(datosActReSMC()[[1]][[3]])
-  
-  BalanceXEstratoFEYrsDt<-as.data.frame(datosBalanceMC()[[1]][[3]])
-  BalancexFEYrs<-as.data.frame(datosBalancexFExYrsMC()[[1]][[3]])
-  BalancexYrs<-as.data.frame(datosBalanceTotalXyrs()[[1]][[3]])
-  
-  
-  output$downloadReport <- downloadHandler(
-    filename = function() {
-      if (input$format == "PDF") {
-        "reporte_generado.pdf"
-      } else if (input$format == "Word") {
-        "reporte_generado.docx"
-      } else {
-        "reporte_generado.xlsx"
-      }
-    },
-    content = function(file) {
-      if (input$format %in% c("PDF", "Word")) {
-        contenidoReporte<-fRmd()
-        rmarkdown::render(text = contenidoReporte, output_format = paste0(input$format, "_document"), output_file = file)
-      } else {
-        
-        wb <- openxlsx::createWorkbook()
-        
-        # Agregar datos y crear hojas de cálculo en el archivo Excel
-        openxlsx::addWorksheet(wb, "Resevorios")
-        openxlsx::writeData(wb, "Resevorios", data.frame(ResevorioDt))
-        
-        openxlsx::addWorksheet(wb, "SumReservoriosMC")
-        openxlsx::writeData(wb, "SumReservoriosMC", data.frame(ResevorioDtMC))
-        
-        openxlsx::addWorksheet(wb, "ReferenciaArea")
-        openxlsx::writeData(wb, "ReferenciaArea", data.frame(RefereDt))
-        
-        openxlsx::addWorksheet(wb, "ReferenciaMC")
-        openxlsx::writeData(wb, "ReferenciaMC", data.frame(RefereDtMC))
-        
-        openxlsx::addWorksheet(wb, "ResultadosArea")
-        openxlsx::writeData(wb, "ResultadosArea", data.frame(ReSereDt))
-        
-        openxlsx::addWorksheet(wb, "ResultadosMC")
-        openxlsx::writeData(wb, "ResultadosMC", data.frame(ReSereDtMC))
-        
-        openxlsx::addWorksheet(wb, "BalanceRES-REF_MC")
-        openxlsx::writeData(wb, "BalanceRES-REF_MC", data.frame(BalanceXEstratoFEYrsDt))
-        
-        openxlsx::addWorksheet(wb, "BalanceFEYrs")
-        openxlsx::writeData(wb, "BalanceFEYrs", data.frame(BalancexFEYrs))
-        
-        openxlsx::addWorksheet(wb, "BalanceYrs")
-        openxlsx::writeData(wb, "BalanceYrs", data.frame(BalancexYrs))
-        
-        # Guardar el archivo Excel
-        openxlsx::saveWorkbook(wb, file)
-      }
-    }
-  )
+  return(list(ResevorioDt, ResevorioDtMC, RefereDt, RefereDtMC,
+              ReSereDt, ReSereDtMC, BalanceXEstratoFEYrsDt, BalancexFEYrs, BalancexYrs))
   
 }
 
+
+ReporteExcelRmrd<-function(output, datosReactivos, formato, filename) {
+  contenidoReporte <- NULL
+  print('dentroFUncion')
+  if (formato %in% c("PDF", "Word")) {
+     contenidoReporte <- fRmd(formato)  
+   
+    rmarkdown::render(contenidoReporte, output_file = file_name)
+  } else {
+    # Generar el reporte en Excel
+    wb <- openxlsx::createWorkbook()
+    nxls <- c('Resevorios', 'SumReservoriosMC', 'ReferenciaArea', 'ReferenciaMC', 'ResultadosArea', 'ResultadosMC', 'Balance RESMC-REFMC', 'BalanceFEYrs', 'BalanceYrs')
+    
+    for (i in 1:length(datosReactivos)) {
+      openxlsx::addWorksheet(wb, nxls[i])
+      openxlsx::writeData(wb, nxls[i], data.frame(datosReactivos[[i]]))
+    }
+    
+    openxlsx::saveWorkbook(wb, file = file_name)
+  }
+}
+
+ReporteExcel <- function(output, datosReactivos, formato, file) {
+  if (formato == "Excel") {
+    wb <- openxlsx::createWorkbook()
+    nxls <- c('Resevorios', 'SumReservoriosMC', 'ReferenciaArea', 'ReferenciaMC', 'ResultadosArea', 'ResultadosMC', 'Balance RESMC-REFMC', 'BalanceFEYrs', 'BalanceYrs')
+    
+    for (i in 1:length(datosReactivos)) {
+      openxlsx::addWorksheet(wb, nxls[i])
+      openxlsx::writeData(wb, nxls[i], data.frame(datosReactivos[[i]]))
+    }
+    
+    openxlsx::saveWorkbook(wb, file = 'reporte.xlsx')
+  } else if (formato == "PDF") {
+    # Generar el reporte en PDF
+    pdf_file <- "Reporte.pdf"
+    contenido_pdf <- generatePDFContent(datosReactivos)  # Función para generar contenido PDF
+    write_pdf(contenido_pdf, pdf_file)  # Función para escribir el contenido en un PDF
+  } else {
+    # Generar el reporte en Word
+    docx_file <- "Reporte.docx"
+    contenido_docx <- generateDocxContent(datosReactivos)  # Función para generar contenido Word
+    write_docx(contenido_docx, docx_file)  # Función para escribir el contenido en un archivo Word
+  }
+}
+
+
+  ####################
 ##SIMULACION
 IMC<-cmpfun(function(propag.Vari, nsim, Mean, SE, nplot, CI, type.Propag='Subtraction', plot=TRUE) {
   
