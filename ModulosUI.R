@@ -1,5 +1,4 @@
 ## Modulos Paneles
-
 ReservorioUI<- function(id) {
   tagList(
     sidebarPanel(
@@ -14,7 +13,7 @@ ReservorioUI<- function(id) {
         ),
       )
     ),mainPanel(
-      DT::dataTableOutput(outputId = NS(id, "reserv"))
+      DT::DTOutput(outputId = NS(id, "reserv"))
     )
   )
 }
@@ -26,9 +25,6 @@ ParaEntradaUI0<- function(id) {
       numericInput(NS(id, "nseed"), "Semillas:", value = 126, min = 100, max = 200),
       numericInput(NS(id, "num_simulaciones"), "Número de Simulaciones:", value = 10000, min = 1000, max = 50000, step =1000),
       numericInput(NS(id, "IC"), "Nivel de confianza:", value = 95, min = 80, max = 99),
-      selectInput(NS(id,'Propaga'), 'Tipo de propagación',
-                  choices = c("Adición", "Sustracción", 'Multiplicación'), 
-                  selected = "Adición"),
       numericInput(inputId = NS(id, "RMCarbono"), label = "Peso molecular", min = 3.666667, max = 3.666667, step = NA, value = 3.666667),
       actionButton(inputId = NS(id, "Run"), label = "Ejecutar")
   ),mainPanel(
@@ -43,12 +39,10 @@ ParaEntradaUI<- function(id) {
     sidebarPanel(
       numericInput(NS(id, "nseed"), "Semillas:", value = 126, min = 100, max = 200),
       numericInput(NS(id, "num_simulaciones"), "Número de Simulaciones:", value = 10000, min = 1000, max = 50000, step =1000),
-      numericInput(NS(id, "IC"), "Nivel de confianza:", value = 95, min = 80, max = 99),
-      selectInput(NS(id,'Propaga'), 'Tipo de propagación',
-                  choices = c("Adición", "Sustracción", 'Multiplicación'), 
-                  selected = "Adición"),
+      numericInput(NS(id, "IC"), "Nivel de confianza:", value = 90, min = 80, max = 99),
       actionButton(inputId = NS(id, "Run"), label = "Ejecutar")
     ),mainPanel(
+     
       DT::dataTableOutput(outputId = NS(id, "RESULT"))
     )
   )
@@ -84,34 +78,31 @@ Report <- function(id) {
     sidebarPanel(
       fluidRow(
         column(width = 8,
-               actionButton(inputId = NS(id, "RunReporte"), label = "Generar reporte")
+               actionButton(inputId = NS(id, "RunReporte"), label = HTML('<i class="bi bi-file-text-fill"></i>Generar reporte'))
         )
       ),
       tags$hr(),  
-      selectInput("formato", "Seleccione el formato de salida:",
-                  choices = c("Word", "PDF", "Excel")),
-      downloadButton(inputId = NS(id, "downloadReport"), "Descargar Reporte")
+      downloadButton(outputId = NS(id, "descargaReport"), label='Descarga'),
+      #actionButton(inputId = NS(id, "descargaReport"), label='Descarga'),  # Cambio a actionButton
       #tags$hr(),  
-      
+      selectInput(inputId = NS(id, "Formato"), "Seleccione el formato de salida:",
+               choices = c("Word", "Excel"), selected = "Word"),
+      tags$hr(), 
+      fluidRow(
+        column(width = 8,
+               actionButton(inputId = NS(id, "save"), label = "Guardar datos")
+        )
+      ),
     ),
     mainPanel(
-      uiOutput("renderedReporte")
+      htmlOutput(outputId = NS(id, "Reporte"))
     )
   )
 }
 
 
-#Report<- function(id) { sidebarLayout(
-#  sidebarPanel(
-#    actionButton(inputId = NS(id, "RunReporte"), label = "Generar reporte"),
-#    selectInput("formato", "Seleccione el formato de salida:",
-#                choices = c("Word", "PDF", "Excel")),
-#    downloadButton(NS(id, "downloadReport"), "Descargar Reporte")
-#  ),
-#  mainPanel(
-#    uiOutput("renderedReporte")
-#  )
-#)
-  
-#}
 
+
+Ayuda <- function(id) {
+  mainPanel()
+}

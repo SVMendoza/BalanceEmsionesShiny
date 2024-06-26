@@ -1,22 +1,22 @@
 library(shiny)
-library(DT)
-library(dplyr)
+library(shinythemes)
+library(shinyWidgets)
+library(fontawesome)
+library(shinyalert)
 library(rmarkdown)
 library(knitr)
 
-rm(list=ls())
+library(DT)
+library(dplyr)
+library(R6)
 
+library(compiler)
+library(propagate)
 
-#on.exit(setwd(tempdir()))
+Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
+ 
 
-Dir<-'C:/git_py/CBFEMC/BalanceEmsionesShiny' ##Agregar el directorio de la aplicación
+source('ModulosUI.R')
+source('ModulosServer.R')
+source('FuncionesMC.R')
 
-
-source(paste0(Dir, '/FuncionesMC.r'))
-source(paste0(Dir, '/ModulosUI.r'))
-source(paste0(Dir, '/ModulosServer.r'))
-
-source(paste0(Dir, '/ui.r'))
-source(paste0(Dir, '/server.r'))
-
-shinyApp(ui = ui, server = server)

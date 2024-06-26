@@ -1,29 +1,30 @@
 server <- function(input, output, session) {
   
   
-  datosReactGlob<-reactiveValues(datosG = NULL)
-
+  ModuloReservorios("modulo0")
+    ModuloPropagReservMC('modulo01')
   
+  ModuloActRef('modulo1')
+    ModuloPropagMCRef('modulo11')
+    
+  ModuloActRes('modulo2')
+    ModuloPropagMCRes('modulo21')
   
-  ReservMC <- fServer0("modulo0")
-  dtRes<-ModuloPropagacionMC('modulo01', datos = ReservMC)
+  ModuloPropagMCRefRes('modulo3') 
+  ModuloPropagMCBalanceFe ('modulo31')
+  ModuloPropagMCBalanceTotal('modulo32')
   
-  dtREF<-fServerAct('modulo1')
-  dtREFMC<-ModuloPropagacionMCREF('modulo11', dts1=dtREF, dts2=dtRes)
-  dtRESUL<-fServerAct('modulo2')
-  dtRESULMC<-ModuloPropagacionMCRES('modulo21', dts1=dtRESUL, dts2=dtRes)
+  Moduloreporte('modulo4') 
+  Moduloayuda('modulo5') 
   
-  dtBalance<-ModuloPropagacionMCBalance('modulo3', dts1=dtRESULMC, dts2=dtREFMC) 
-  
-  dtBalanceTotal<-ModuloPropagacionMCBalanceXFeTotal('modulo31', dtsTotal=dtBalance)
-  dtBalanceTotalEnd<-ModuloPropagacionMCBalanceTotal('modulo32', dtsTotall=dtBalanceTotal)
-  
-  Moduloreporte('modulo4', datosRes = ReservMC,datosResMC=dtRes,  datosActRef=dtREF, 
-                datosActRefMC=dtREFMC, datosActReS=dtRESUL, datosActReSMC=dtRESULMC, 
-                datosBalanceMC=dtBalance, datosBalancexFExYrsMC=dtBalanceTotal, datosBalanceTotalXyrs=dtBalanceTotalEnd) 
   observeEvent(input$resetButton, {
     rm(list = ls())
     session$reload()
+    Contener$DeleteDatos(nombre=NULL)
+    filesL<-dir(path=getwd() ,pattern="reporte")
+    file.remove(file.path(getwd(), filesL))
+    if(exists(paste0(getwd(),'datos.rds')))  file.remove(file.path(getwd(), 'datos.rds'))
   })
-  
 }
+
+
