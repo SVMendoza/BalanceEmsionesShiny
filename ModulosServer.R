@@ -32,7 +32,7 @@ ModuloReservorios <- function(id) {
       Contener$guardarTabla("Reservorios", Restb$dRESER)
     })
     
-     output$reserv <-  DT::renderDataTable({renderDatosIngresados(data=Restb$dRESER, names(Restb$dRESER), "")})
+     output$reserv <-  DT::renderDataTable({renderDatosIngresados(data=Restb$dRESER, names(Restb$dRESER), "", condi=TRUE)})
     
     proxy <- DT::dataTableProxy("reserv")
     observeEvent(input$reserv_cell_edit, {
@@ -50,15 +50,11 @@ ModuloReservorios <- function(id) {
 ModuloPropagReservMC <- function(id) {
   moduleServer(id, function(input, output, session) {
     
-   
-    observeEvent(input$Run, {
+   observeEvent(input$Run, {
      
       S<-try(Contener$obtenerDatos("Reservorios"), silent=TRUE)
-  if (!is.null(S) || (class(S)=="try-error" || nrow(S)==0)) {
+      if (!is.null(S) && !(class(S) == "try-error" || nrow(S) == 0)) {
      
-        shinyalert(" ", "No es posible hacer estimaciones, revisa los datos.", type = "message")
-       } else {
-        
         set.seed(input$nseed)
         dMC<-as.data.frame(S)
         
@@ -80,7 +76,7 @@ ModuloPropagReservMC <- function(id) {
           names(sal)<-c('Observado','Mean','S.E',paste0('Lower',' ','(',CI, '%)'),paste0('Upper',' ','(',CI, '%)'),paste0('Uncertainty',' ','(',CI, '%)'))
           sal
         }
-        
+       
         
         for(i in 1:length(FEnam)){
           subDMC<- subset(dMC, FE==FEnam[i])
@@ -91,7 +87,8 @@ ModuloPropagReservMC <- function(id) {
         }
         
         DmcReserv<-as.data.frame(do.call(rbind, Ldt))
-        output$RESULT <-DT::renderDataTable({ DT::datatable(DmcReserv,  
+        output$RESULT <-DT::renderDataTable({ DT::datatable(DmcReserv,
+                                                            colnames = c('Factor de emisión', 'Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')),
                                                             options = list(pageLength = 12, 
                                                                            autoWidth = TRUE, 
                                                                            searching = FALSE),
@@ -99,10 +96,11 @@ ModuloPropagReservMC <- function(id) {
                                                             selection = 'none',
                                                             editable = FALSE)
         })
-        
+        Contener$guardarTabla("MCReservorio", DmcReserv)
       }
-      
-      Contener$guardarTabla("MCReservorio", DmcReserv)
+     
+   else { shinyalert(" ", "No es posible hacer estimaciones, revisa los datos.", type = "message") }
+     
     })
   })
 }
@@ -141,7 +139,7 @@ ModuloActRef <- function(id) {
       Contener$guardarTabla("AreaReferencia",  ActReftb$dtRef)
     })
     
-    output$ActRefer <- DT::renderDataTable({renderDatosIngresados(data=ActReftb$dtRef, names(ActReftb$dtRef), "")})
+    output$ActRefer <- DT::renderDataTable({renderDatosIngresados(data=ActReftb$dtRef, names(ActReftb$dtRef), "", condi=FALSE)})
 
     proxy <- DT::dataTableProxy("ActRefer")
     
@@ -197,7 +195,8 @@ ModuloPropagMCRef <- function(id) {
         dMCRef<-data.frame(FE=S$FE, Yrs=S$Yrs, Estrato=S$Estrato, Observado=dd$Mean.x*dd$Observado, do.call(rbind, L))
         
         
-        output$RESULT<-DT::renderDataTable({ DT::datatable(dMCRef,  
+        output$RESULT<-DT::renderDataTable({ DT::datatable(dMCRef, 
+                                                           colnames = c('Factor de emisión', 'Año', 'Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')),
                                                            options = list(pageLength = 12, 
                                                                           autoWidth = TRUE, 
                                                                           searching = FALSE),
@@ -248,7 +247,7 @@ ModuloActRes <- function(id) {
       Contener$guardarTabla("AreaResultados",  ActRefREStb$dtRes)
     })
     
-    output$ActRefer <- DT::renderDataTable({renderDatosIngresados(data=ActRefREStb$dtRes, names(ActRefREStb$dtRes), "")})
+    output$ActRefer <- DT::renderDataTable({renderDatosIngresados(data=ActRefREStb$dtRes, names(ActRefREStb$dtRes), "", condi=FALSE)})
       
     proxy <- DT::dataTableProxy("ActRefer")
     
@@ -300,7 +299,8 @@ ModuloPropagMCRes <- function(id) {
       L<-lapply(1:nrow(dd), function(i) f(dd[i, ]))
       dMCReS<-data.frame(FE=S$FE, Yrs=S$Yrs, Estrato=S$Estrato, Observado=dd$Mean.x*dd$Observado, do.call(rbind, L))
 
-      output$RESULT<-DT::renderDataTable({ DT::datatable(dMCReS,  
+      output$RESULT<-DT::renderDataTable({ DT::datatable(dMCReS,
+                                                         colnames = c('Factor de emisión', 'Año', 'Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')),
                                                          options = list(pageLength = 12, 
                                                                         autoWidth = TRUE, 
                                                                         searching = FALSE),
@@ -374,8 +374,9 @@ ModuloPropagMCRefRes <- function(id) {
       dMCDelta<-data.frame(Yrs=dd$Yrs1, FE=dd$FE, Estrato=dd$Estrato,Observado=dd$Observado-dd$Observado1, do.call(rbind, L))
       
       
-      output$RESULT<-DT::renderDataTable({DT::datatable(dMCDelta,  
-                                                         options = list(pageLength = 12, 
+      output$RESULT<-DT::renderDataTable({DT::datatable(dMCDelta, 
+                                                        colnames = c('Año', 'Factor de emisión','Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')),
+                                                        options = list(pageLength = 12, 
                                                                         autoWidth = TRUE, 
                                                                         searching = FALSE),
                                                          rownames = FALSE,
@@ -446,6 +447,7 @@ ModuloPropagMCBalanceFe <- function(id) {
       
       dataBalFE<-as.data.frame(do.call(rbind, Ldtt))
       output$RESULT <-DT::renderDataTable({ DT::datatable(dataBalFE,  
+                                                          colnames = c('Año', 'Factor de emisión', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')),
                                                           options = list(pageLength = 12, 
                                                                          autoWidth = TRUE, 
                                                                          searching = FALSE),
@@ -480,7 +482,7 @@ ModuloPropagMCBalanceTotal <- function(id) {
          } else {
           set.seed(input$nseed)
           nsim<-input$num_simulaciones
-          CI<-input$IC
+          CI<<-input$IC
           
           f<-function(x) {
             sal<-try(IMC(propag.Vari=paste0('S',x$FE), nsim=nsim, Mean=x$Mean, SE=x$S.E, nplot=100, 
@@ -501,6 +503,7 @@ ModuloPropagMCBalanceTotal <- function(id) {
             
         }
         output$RESULT <-DT::renderDataTable({ DT::datatable(dataBalTot,  
+                                                            colnames = c('Año', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Uncertainty',' ','(',CI, '%)')),
                                                             options = list(pageLength = 12, 
                                                                            autoWidth = TRUE, 
                                                                            searching = FALSE),
@@ -541,6 +544,8 @@ moduleServer(id, function(input, output, session) {
           
           Nombre <- x1
           Reporte<-x
+          
+          
           L <- list(
             Contener$obtenerDatos("Reservorios"),
             Contener$obtenerDatos("MCReservorio"),
@@ -554,10 +559,11 @@ moduleServer(id, function(input, output, session) {
             Contener$obtenerDatos("BalanceTotal")
           )
           
+          print(L)
           tempF <- paste0(getwd(), '/datos.rds')
           saveRDS(L, file = tempF)
           
-          contenido_html <- fRmd(tempF = tempF, formato = "html", Nombre = Nombre, Reporte=Reporte)
+          contenido_html <- fRmd(tempF = tempF, formato = "html", Nombre = Nombre, Reporte=Reporte, CI=CI)
           temp_file <- paste0(getwd(), '/report.rmd')
           
           writeLines(contenido_html, temp_file)
@@ -609,14 +615,14 @@ moduleServer(id, function(input, output, session) {
      # formato <- isolate(input$Formato)
       
       if(input$Formato == 'Excel') {
-        contenido<-ReporteExcel(formato=input$Formato, fRmd, L, Nombre, Reporte)
+        contenido<-ReporteExcel(formato=input$Formato, fRmd, L, Nombre, Reporte, CI)
         writeBin(contenido, file)
       } else if(input$Formato == 'Word') {
-        contenido <- ReporteExcel(formato = input$Formato, fRmd, L, Nombre, Reporte)
+        contenido <- ReporteExcel(formato = input$Formato, fRmd, L, Nombre, Reporte,CI)
         writeLines(contenido, 'report.Rmd')
         rmarkdown::render('report.Rmd', output_file = file, output_format = "word_document")
       } else if(input$Formato == 'PDF') {
-        contenido <- ReporteExcel(formato = input$Formato, fRmd, L, Nombre)
+        contenido <- ReporteExcel(formato = input$Formato, fRmd, L, Nombre,CI)
         writeBin(charToRaw(contenido), file)
       }
     }

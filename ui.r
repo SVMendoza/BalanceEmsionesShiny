@@ -30,17 +30,15 @@ ui <- fluidPage(
       span(
         style = "display: flex; align-items: center;",
         img(src = "logo.png", height = 65), 
-        h2("Estimación de las reducciones de emisiones", style = "color: #2e7d32; margin-left: 15px;")
+        h2("Estimación de los balances de emisiones de CO2eq", style = "color: #2e7d32; margin-left: 15px;")
       ),
       tags$a(
-        href = "https://github.com/SVMendoza",
+        href = "https://github.com/SVMendoza/BalanceEmsionesShiny",
         tags$i(class = "fab fa-github", style = "font-size: 30px; color: black; margin-right: 15px;")
       ),
       # Botón con icono de árbol
       )
   ),
-  
-  # Botón de limpiar sesión
   actionButton(
     "resetButton", 
     label = tagList(icon("broom"), " Limpiar Sesión"), 
@@ -53,7 +51,7 @@ ui <- fluidPage(
       title = tagList(icon("leaf"), " Reservorios"),
       tabsetPanel(
         tabPanel(
-          title = tagList(icon("check"), " Entrada"),
+          title = tagList(icon("check"), "Entrada"),
           fluidRow(
             column(12, ReservorioUI('modulo0'))  # Formularios bien acoplados dentro de la pestaña
           )

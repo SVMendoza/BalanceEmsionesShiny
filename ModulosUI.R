@@ -25,7 +25,7 @@ ParaEntradaUI0<- function(id) {
       numericInput(NS(id, "nseed"), "Semillas:", value = 126, min = 100, max = 200),
       numericInput(NS(id, "num_simulaciones"), "Número de Simulaciones:", value = 10000, min = 1000, max = 50000, step =1000),
       numericInput(NS(id, "IC"), "Nivel de confianza:", value = 95, min = 80, max = 99),
-      numericInput(inputId = NS(id, "RMCarbono"), label = "Peso molecular", min = 3.666667, max = 3.666667, step = NA, value = 3.666667),
+      numericInput(inputId = NS(id, "RMCarbono"), label = "Factor de conversión", min = 0, max = 100, step = NA, value = 3.666667),
       actionButton(inputId = NS(id, "Run"), label = "Ejecutar")
   ),mainPanel(
       DT::dataTableOutput(outputId = NS(id, "RESULT"))

@@ -1,14 +1,16 @@
 ## Renderizar tablas editables
 
 
-renderDatosIngresados <- function(data, namess, captation) {
- 
-    DT::datatable(data, 
+renderDatosIngresados <- function(data, namess, captation, condi) {
+ if(isTRUE(condi)) names<-c('Factor de emisión', 'Reservorio', 'Estrato', 'Media', 'E.E') else names<-c('Factor de emisión','Año', 'Estrato', 'Media', 'E.E')
+               
+    DT::datatable(data,
+                  colnames = names,
                   options = list(pageLength = 12, autoWidth = TRUE, searching = FALSE),
                   rownames = TRUE,
                   selection = 'none',
                   editable = 'cell',  
-                  colnames = namess, 
+                  #colnames = namess, 
                   caption = captation)
  
 }
@@ -57,12 +59,18 @@ ContenedorDatos <- R6::R6Class("ContenedorDatos",
 # Crear una instancia de la clase ContenedorDatos
 Contener <- ContenedorDatos$new()
 
+
+
+
+
 ###################################################
 #### archivo markdown funcion
-fRmd<-function(tempF, formato, Nombre, Reporte) {
-  Fec<-Sys.Date()
+
+
+fRmd <- function(tempF, formato, Nombre, Reporte, CI) {
+  Fec <- Sys.Date()
   paste0("---\n",
-         "title: ",Reporte,"\n",
+         "title: ", Reporte, "\n",
          "author: ", Nombre, "\n",
          "date: ", Fec, "\n",
          "output: ", formato, "_document\n",
@@ -72,29 +80,31 @@ fRmd<-function(tempF, formato, Nombre, Reporte) {
          "### Reservorios\n\n",
          "```{r setup, include=FALSE}\n",
          "knitr::opts_chunk$set(echo = TRUE)\n",
-         "L<-readRDS(file='",tempF,"')\n",
+         "L <- readRDS(file='", tempF, "')\n",
          "```\n\n",
          "```{r, echo=FALSE, warning=FALSE, message=FALSE}\n",
-         "knitr::kable(L[[1]], caption = 'Resevorios $tC ha^-1$ ')\n",
-         "knitr::kable(L[[2]], caption = 'Total de estimacines $tCO2e ha$')\n\n",
-         "```\n\n","### Datos de actividad:\n\n",
-         
+         "knitr::kable(L[[1]], booktabs=TRUE, format='pandoc', caption = 'Reservorios $\\\\mathrm{t\\\\\ C/ha}$', col.names=c('Factor de emisión', 'Reservorio', 'Estrato', 'Media', 'E.E'))\n",
+         "knitr::kable(L[[2]], booktabs=TRUE, format='pandoc', caption = 'Total de $\\\\mathrm{t\\ CO_2\\\\eq/ha}$', col.names = c('Factor de emisión', 'Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')))\n\n",
+         "```\n\n",
+         "### Datos de actividad:\n\n",
          "```{r, echo=FALSE, warning=FALSE, message=FALSE}\n",
-         "knitr::kable(L[[3]], caption = 'Referencia $ha  yrs^-1$')\n",
-         "knitr::kable(L[[4]], caption = 'Resultados $ha  yrs^-1$')\n\n",
+         "knitr::kable(L[[3]], booktabs=TRUE, format='pandoc', caption = 'Referencia $\\\\mathrm{ha/yr}$', col.names=c('Factor de emisión', 'Año',  'Estrato', 'Media', 'E.E'))\n",
+         "knitr::kable(L[[5]], booktabs=TRUE, format='pandoc', caption = 'Resultados $\\\\mathrm{ha/yr}$', col.names=c('Factor de emisión', 'Año',  'Estrato', 'Media', 'E.E'))\n\n",
          "```\n\n",
          "```{r, echo=FALSE, warning=FALSE, message=FALSE}\n",
-         "knitr::kable(L[[5]], caption = 'Referencia $(tCO2e  yrs^-1)$ Monte Carlo')\n",
-         "knitr::kable(L[[6]], caption = 'Resultados $(tCO2e  yrs^-1)$ Monte Carlo')\n\n",
+         "knitr::kable(L[[4]], booktabs=TRUE, format='pandoc', caption = 'Referencia en $\\\\mathrm{t\\\\ CO_2\\\\eq/ha/yr}$ Monte Carlo', col.names=c('Factor de emisión', 'Año', 'Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')))\n",
+         "knitr::kable(L[[6]], booktabs=TRUE, format='pandoc', caption = 'Resultados en $\\\\mathrm{t\\\\ CO_2\\\\eq/ha/yr}$ Monte Carlo', col.names=c('Factor de emisión', 'Año', 'Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' ','(',CI, '%)'),paste0('Limite superior',' ','(',CI, '%)'),paste0('Incertidumbre',' ','(',CI, '%)')))\n\n",
          "```\n\n",
-         "### Balances:\n\n", 
+         "### Balances:\n\n",
          "```{r, echo=FALSE, warning=FALSE, message=FALSE}\n",
-         "knitr::kable(L[[7]], caption = 'Referencia - Resultado $(ha yrs^-1)$ Monte Carlo')\n",
-         "knitr::kable(L[[8]], caption = 'Referencia - Resultado $(tCO2e  yrs^-1)$ Monte Carlo')\n",
-         "knitr::kable(L[[9]], caption = 'Balance FE y año $(tCO2e yrs^-1)$ Monte Carlo')\n",
-         "knitr::kable(L[[10]], caption = 'Balance total por año $(tCO2e  yrs^-1)$ Monte Carlo')\n",
+         "knitr::kable(L[[7]], booktabs=TRUE, format='pandoc', caption = 'Referencia - Resultado en $\\\\mathrm{ha/yr}$ Monte Carlo', col.names=c('Año','Estrato','Factor de emisión', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' (',CI, '%)'),paste0('Limite superior',' (',CI, '%)'),paste0('Incertidumbre',' (',CI, '%)')))\n",
+         "knitr::kable(L[[8]], booktabs=TRUE, format='pandoc', caption = 'Referencia - Resultado en $\\\\mathrm{t\\\\ CO_2\\\\eq/ha/yr}$ Monte Carlo', col.names=c('Año', 'Factor de emisión','Estrato', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' (',CI, '%)'),paste0('Limite superior',' (',CI, '%)'),paste0('Incertidumbre',' (',CI, '%)')))\n",
+         "knitr::kable(L[[9]], booktabs=TRUE, format='pandoc', caption = 'Balance por factor de emisión y año $\\\\mathrm{t\\\\ CO_2\\\\eq/ha/yr}$ Monte Carlo', col.names=c('Año', 'Factor de emisión','Observado', 'Media', 'E.E', paste0('Limite inferior',' (',CI, '%)'),paste0('Limite superior',' (',CI, '%)'),paste0('Incertidumbre',' (',CI, '%)')))\n",
+         "knitr::kable(L[[10]], booktabs=TRUE, format='pandoc', caption = 'Balance total en $\\\\mathrm{t\\\\ CO_2\\\\eq/ha/yr}$ Monte Carlo', col.names=c('Año', 'Observado', 'Media', 'E.E', paste0('Limite inferior',' (',CI, '%)'),paste0('Limite superior',' (',CI, '%)'),paste0('Incertidumbre',' (',CI, '%)')))\n",
          "```\n\n")
 }
+
+
 
 ###################################################
 
@@ -108,6 +118,7 @@ ReporteExcel <- function(formato, fRmd, L, Nombre, Reporte) {
     
     for (i in 1:length(L)) {
       openxlsx::addWorksheet(wb, nxls[i])
+      #colnames(L[[i]])<-c()
       openxlsx::writeData(wb, nxls[i], data.frame(L[[i]]))
     }
     
